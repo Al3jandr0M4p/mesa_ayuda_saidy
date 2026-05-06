@@ -29,10 +29,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .from("usuarios")
       .select("*")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     if (profileError) {
       throw new Error("No se pudo cargar el perfil del usuario.");
+    }
+
+    if (!data) {
+      throw new Error("La sesion existe, pero falta el perfil del usuario en la tabla usuarios.");
     }
 
     setProfile(data);
@@ -53,6 +57,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true;
 
+    const applySession = async (nextSession: Session | null) => {
+      if (!isMounted) {
+        return;
+      }
+
+      setSession(nextSession);
+      setError(supabaseConfigError);
+
+      if (!nextSession?.user.id) {
+        setProfile(null);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+
+      try {
+        await fetchProfile(nextSession.user.id);
+      } catch (profileError) {
+        if (!isMounted) {
+          return;
+        }
+
+        setProfile(null);
+        setError(profileError instanceof Error ? profileError.message : "Error cargando perfil.");
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
     const loadSession = async () => {
       setIsLoading(true);
 
@@ -68,44 +104,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      setSession(data.session);
-
-      if (data.session?.user.id) {
-        try {
-          await fetchProfile(data.session.user.id);
-        } catch (profileError) {
-          setError(profileError instanceof Error ? profileError.message : "Error cargando perfil.");
-        }
-      }
-
-      if (isMounted) {
-        setIsLoading(false);
-      }
+      await applySession(data.session);
     };
 
     void loadSession();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
-      setSession(nextSession);
-      setError(supabaseConfigError);
-
-      if (!nextSession?.user.id) {
-        setProfile(null);
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        await fetchProfile(nextSession.user.id);
-      } catch (profileError) {
-        setProfile(null);
-        setError(profileError instanceof Error ? profileError.message : "Error cargando perfil.");
-      } finally {
-        setIsLoading(false);
-      }
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      // Avoid awaiting Supabase calls directly inside this callback.
+      queueMicrotask(() => {
+        void applySession(nextSession);
+      });
     });
 
     return () => {

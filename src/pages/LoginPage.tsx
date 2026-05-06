@@ -19,7 +19,7 @@ export function LoginPage() {
     return state?.from?.pathname ?? "/";
   }, [location.state]);
 
-  if (!isLoading && user) {
+  if (!isLoading && user && role) {
     return <Navigate to={getDashboardPath(role)} replace />;
   }
 
