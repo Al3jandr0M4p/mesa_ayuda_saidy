@@ -2,8 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedLayout } from "./components/ProtectedLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { RoleRedirect } from "./components/RoleRedirect";
+import { DetalleTicketEmpleadaPage, PanelEmpleadaPage } from "./modules/empleada";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
-import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 
@@ -16,7 +16,8 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route element={<ProtectedLayout />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<PanelEmpleadaPage />} />
+            <Route path="/tickets/:ticketId" element={<DetalleTicketEmpleadaPage />} />
           </Route>
         </Route>
 

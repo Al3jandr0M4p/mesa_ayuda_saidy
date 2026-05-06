@@ -14,5 +14,9 @@ export function RoleRedirect() {
     return <Navigate to="/login" replace />;
   }
 
+  if (!role) {
+    return <Navigate to="/login" replace />;
+  }
+
   return <Navigate to={getDashboardPath(role)} replace />;
 }
