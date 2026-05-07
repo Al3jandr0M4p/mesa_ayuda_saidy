@@ -33,9 +33,9 @@ export async function crearTicketEmpleada({ titulo, descripcion, prioridad, user
     user_id: userId,
   };
 
-  const { data, error } = await (supabase
-    .from("tickets") as any)
-    .insert([payload])
+  const { data, error } = await supabase
+    .from("tickets")
+    .insert([payload as never])
     .select(TICKET_COLUMNS)
     .single();
 
@@ -94,9 +94,9 @@ export async function crearComentarioTicketEmpleada({
     mensaje,
   };
 
-  const { data, error } = await (supabase
-    .from("comentarios") as any)
-    .insert([payload])
+  const { data, error } = await supabase
+    .from("comentarios")
+    .insert([payload as never])
     .select("id, ticket_id, user_id, mensaje, created_at")
     .single();
 

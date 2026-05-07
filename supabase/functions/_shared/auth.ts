@@ -1,6 +1,7 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { jsonResponse } from "./http.ts";
+import { getServiceClient } from "./supabase.ts";
 
-type AuthenticatedRequest = {
+export type AuthenticatedRequest = {
   user: {
     id: string;
     email?: string;
@@ -13,30 +14,14 @@ export async function requireAuth(req: Request): Promise<AuthenticatedRequest | 
   const token = authHeader?.replace("Bearer ", "");
 
   if (!token) {
-    return new Response(JSON.stringify({ error: "Missing bearer token" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse({ error: "Missing bearer token" }, 401);
   }
 
-  const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    return new Response(JSON.stringify({ error: "Supabase environment is not configured" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  const supabase = createClient(supabaseUrl, serviceRoleKey);
+  const supabase = getServiceClient();
   const { data, error } = await supabase.auth.getUser(token);
 
   if (error || !data.user) {
-    return new Response(JSON.stringify({ error: "Invalid or expired session" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse({ error: "Invalid or expired session" }, 401);
   }
 
   return {
@@ -46,4 +31,29 @@ export async function requireAuth(req: Request): Promise<AuthenticatedRequest | 
     },
     token,
   };
+}
+
+export async function requireAdmin(req: Request): Promise<AuthenticatedRequest | Response> {
+  const auth = await requireAuth(req);
+
+  if (auth instanceof Response) {
+    return auth;
+  }
+
+  const supabase = getServiceClient();
+  const { data, error } = await supabase
+    .from("usuarios")
+    .select("rol")
+    .eq("id", auth.user.id)
+    .maybeSingle();
+
+  if (error) {
+    return jsonResponse({ error: "Could not verify user role" }, 500);
+  }
+
+  if (data?.rol !== "admin") {
+    return jsonResponse({ error: "Admin role is required" }, 403);
+  }
+
+  return auth;
 }

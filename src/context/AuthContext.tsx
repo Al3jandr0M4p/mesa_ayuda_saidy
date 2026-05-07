@@ -7,6 +7,7 @@ import {
 } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase, supabaseConfigError } from "../services/supabaseClient";
+import { loginWithEdgeFunction } from "../services/edgeFunctions";
 import type { UserProfile } from "../types/database";
 import { AuthContext, type AuthContextValue } from "./auth-context";
 
@@ -126,18 +127,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string) => {
     setError(null);
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
 
-    if (loginError) {
-      const message = getAuthErrorMessage(loginError.message);
+    try {
+      const nextProfile = await loginWithEdgeFunction(email, password);
+      setProfile(nextProfile);
+      return { ok: true };
+    } catch (loginError) {
+      const message = getAuthErrorMessage(loginError instanceof Error ? loginError.message : "No se pudo iniciar sesion.");
       setError(message);
       return { ok: false, error: message };
     }
-
-    return { ok: true };
   }, []);
 
   const signOut = useCallback(async () => {

@@ -4,6 +4,8 @@ export type TicketPriority = "baja" | "media" | "alta";
 
 export type TicketStatus = "abierto" | "en_progreso" | "cerrado";
 
+export type EventPlatform = "google_meet" | "microsoft_teams" | "zoom" | "presencial" | "otro";
+
 export type UserProfile = {
   id: string;
   nombre: string;
@@ -11,6 +13,11 @@ export type UserProfile = {
   rol: UserRole;
   created_at: string;
   updated_at: string;
+};
+
+export type Role = {
+  id: UserRole;
+  nombre: string;
 };
 
 export type Ticket = {
@@ -32,11 +39,21 @@ export type Comment = {
   created_at: string;
 };
 
+export type TicketWithUser = Ticket & {
+  usuarios?: Pick<UserProfile, "nombre" | "email" | "rol"> | null;
+};
+
+export type CommentWithUser = Comment & {
+  usuarios?: Pick<UserProfile, "nombre" | "email"> | null;
+};
+
 export type Event = {
   id: string;
   titulo: string;
   descripcion: string;
   fecha: string;
+  plataforma: EventPlatform;
+  enlace_reunion: string | null;
   created_at: string;
 };
 
@@ -50,6 +67,11 @@ export type Database = {
           updated_at?: string;
         };
         Update: Partial<Omit<UserProfile, "id" | "created_at" | "updated_at">>;
+      };
+      roles: {
+        Row: Role;
+        Insert: Role;
+        Update: Partial<Role>;
       };
       tickets: {
         Row: Ticket;
@@ -70,8 +92,10 @@ export type Database = {
       };
       eventos: {
         Row: Event;
-        Insert: Omit<Event, "id" | "created_at"> & {
+        Insert: Omit<Event, "id" | "created_at" | "plataforma" | "enlace_reunion"> & {
           id?: string;
+          plataforma?: EventPlatform;
+          enlace_reunion?: string | null;
           created_at?: string;
         };
         Update: Partial<Omit<Event, "id" | "created_at">>;

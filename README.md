@@ -45,6 +45,19 @@ export default defineConfig([
 ])
 ```
 
+## Google Meet en el panel admin
+
+La creacion automatica de reuniones de Google Meet usa Google Calendar API con OAuth 2.0.
+
+Variables necesarias en el entorno de Supabase Edge Functions:
+
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REFRESH_TOKEN`
+- `GOOGLE_CALENDAR_ID` opcional, usa `primary` por defecto
+
+Cuando el admin crea un evento con `plataforma = google_meet`, la edge function crea el evento en Google Calendar y guarda el enlace de Meet en la tabla `eventos`.
+
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js
