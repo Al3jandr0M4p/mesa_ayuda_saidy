@@ -1,4 +1,4 @@
-import type { Ticket, TicketPriority } from "../../types/database";
+import type { EventPlatform, Ticket, TicketPriority } from "../../types/database";
 
 export const prioridadesTicketEmpleada: TicketPriority[] = ["baja", "media", "alta"];
 
@@ -24,4 +24,12 @@ export const etiquetasEstadoTicketEmpleada: Record<Ticket["estado"], string> = {
   abierto: "Pendiente",
   en_progreso: "En proceso",
   cerrado: "Resuelto",
+};
+
+export const etiquetasPlataformaEvento: Record<EventPlatform, string> = {
+  google_meet: "Google Meet",
+  microsoft_teams: "Microsoft Teams",
+  zoom: "Zoom",
+  presencial: "Presencial",
+  otro: "Otro",
 };

@@ -14,7 +14,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<RoleRedirect />} />
 
-        <Route element={<ProtectedRoute />}>
+        <Route element={<ProtectedRoute allowedRoles={["empleado"]} />}>
           <Route element={<ProtectedLayout />}>
             <Route path="/dashboard" element={<PanelEmpleadaPage />} />
             <Route path="/tickets/:ticketId" element={<DetalleTicketEmpleadaPage />} />

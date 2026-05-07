@@ -30,7 +30,7 @@ export function DetalleTicketEmpleadaPage() {
 
   useEffect(() => {
     if (!user?.id || !ticketId) {
-      setIsLoading(false);
+      queueMicrotask(() => setIsLoading(false));
       return;
     }
 

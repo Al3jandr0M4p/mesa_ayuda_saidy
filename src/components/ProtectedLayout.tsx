@@ -9,7 +9,7 @@ const navItems: Array<{
   icon: typeof TicketCheck;
   roles: UserRole[];
 }> = [
-  { label: "Dashboard", href: "/dashboard", icon: TicketCheck, roles: ["empleado", "admin"] },
+  { label: "Dashboard", href: "/dashboard", icon: TicketCheck, roles: ["empleado"] },
   { label: "Admin", href: "/admin", icon: ShieldCheck, roles: ["admin"] },
 ];
 
