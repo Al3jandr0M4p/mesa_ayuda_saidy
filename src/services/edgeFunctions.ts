@@ -28,6 +28,11 @@ async function getEdgeFunctionErrorMessage(error: unknown) {
 
     if (response instanceof Response) {
       const body = await response.json().catch(() => null);
+
+      if (response.status === 404) {
+        return "La Edge Function no esta desplegada o el nombre no coincide.";
+      }
+
       return typeof body?.error === "string"
         ? body.error
         : (error as { message?: string }).message ?? "Error inesperado";
@@ -35,6 +40,10 @@ async function getEdgeFunctionErrorMessage(error: unknown) {
   }
 
   if (error instanceof Error) {
+    if (error.message.includes("Failed to send a request to the Edge Function")) {
+      return "No se pudo conectar con la Edge Function. Revisa que este desplegada en Supabase y que el nombre sea correcto.";
+    }
+
     return error.message;
   }
 
@@ -79,7 +88,7 @@ export async function loginWithEdgeFunction(email: string, password: string) {
 }
 
 export async function obtenerDashboardAdmin() {
-  const { data, error } = await supabase.functions.invoke<AdminDashboardData>("admin-api", {
+  const { data, error } = await supabase.functions.invoke<AdminDashboardData>("quick-function", {
     method: "GET",
   });
 
@@ -95,7 +104,7 @@ export async function obtenerDashboardAdmin() {
 }
 
 export async function actualizarEstadoTicketAdmin(id: string, estado: TicketStatus) {
-  const { data, error } = await supabase.functions.invoke<{ ticket: TicketWithUser }>("admin-api", {
+  const { data, error } = await supabase.functions.invoke<{ ticket: TicketWithUser }>("quick-function", {
     method: "POST",
     body: { action: "update-ticket-status", id, estado },
   });
@@ -112,7 +121,7 @@ export async function actualizarEstadoTicketAdmin(id: string, estado: TicketStat
 }
 
 export async function crearComentarioAdmin(ticketId: string, mensaje: string) {
-  const { data, error } = await supabase.functions.invoke<{ comment: CommentWithUser }>("admin-api", {
+  const { data, error } = await supabase.functions.invoke<{ comment: CommentWithUser }>("quick-function", {
     method: "POST",
     body: { action: "add-comment", ticket_id: ticketId, mensaje },
   });
@@ -134,10 +143,17 @@ export async function crearEventoAdmin(input: {
   fecha: string;
   plataforma: Event["plataforma"];
   enlace_reunion?: string | null;
+  durationMinutes?: number;
 }) {
-  const { data, error } = await supabase.functions.invoke<{ event: Event }>("admin-api", {
+  const enlaceReunion = input.enlace_reunion?.trim() || null;
+  const { data, error } = await supabase.functions.invoke<{ event: Event }>("quick-function", {
     method: "POST",
-    body: { action: "create-event", ...input },
+    body: {
+      action: "create-event",
+      ...input,
+      enlace_reunion: enlaceReunion,
+      link: enlaceReunion,
+    },
   });
 
   if (error) {
@@ -157,7 +173,7 @@ export async function crearUsuarioAdmin(input: {
   rol: UserRole;
   password: string;
 }) {
-  const { data, error } = await supabase.functions.invoke<{ user: UserProfile }>("admin-api", {
+  const { data, error } = await supabase.functions.invoke<{ user: UserProfile }>("admin-users", {
     method: "POST",
     body: { action: "create-user", ...input },
   });
@@ -180,7 +196,7 @@ export async function actualizarUsuarioAdmin(input: {
   rol: UserRole;
   password?: string;
 }) {
-  const { data, error } = await supabase.functions.invoke<{ user: UserProfile }>("admin-api", {
+  const { data, error } = await supabase.functions.invoke<{ user: UserProfile }>("admin-users", {
     method: "POST",
     body: { action: "update-user", ...input },
   });
@@ -197,7 +213,7 @@ export async function actualizarUsuarioAdmin(input: {
 }
 
 export async function eliminarUsuarioAdmin(id: string) {
-  const { data, error } = await supabase.functions.invoke<{ ok: true }>("admin-api", {
+  const { data, error } = await supabase.functions.invoke<{ ok: true }>("admin-users", {
     method: "POST",
     body: { action: "delete-user", id },
   });
