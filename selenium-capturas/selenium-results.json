@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "baseUrl": "http://127.0.0.1:4174",
+  "results": [
+    {
+      "name": "Carga de login",
+      "status": "PASS",
+      "detail": "Se mostro la pantalla de inicio de sesion."
+    },
+    {
+      "name": "Validacion de formulario vacio",
+      "status": "PASS",
+      "detail": "La app mostro el mensaje esperado."
+    },
+    {
+      "name": "Proteccion de /admin",
+      "status": "PASS",
+      "detail": "La ruta protegida redirigio a /login."
+    },
+    {
+      "name": "Ruta 404",
+      "status": "PASS",
+      "detail": "La app mostro la pagina de ruta no encontrada."
+    },
+    {
+      "name": "Login responsive movil",
+      "status": "PASS",
+      "detail": "La pantalla de login cargo en viewport movil."
+    }
+  ]
+}

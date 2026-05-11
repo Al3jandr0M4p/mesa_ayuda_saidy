@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Reporte de pruebas E2E - Mesa de ayuda Saidy</title>
+    <style>
+      @page {
+        margin: 18mm;
+      }
+
+      body {
+        color: #172033;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        line-height: 1.45;
+        margin: 0;
+      }
+
+      h1,
+      h2,
+      h3 {
+        color: #101828;
+        margin: 0 0 8px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      h2 {
+        border-bottom: 1px solid #d0d5dd;
+        font-size: 18px;
+        margin-top: 24px;
+        padding-bottom: 6px;
+      }
+
+      h3 {
+        font-size: 14px;
+        margin-top: 16px;
+      }
+
+      code {
+        background: #f2f4f7;
+        border-radius: 4px;
+        color: #344054;
+        padding: 2px 4px;
+      }
+
+      pre {
+        background: #101828;
+        border-radius: 8px;
+        color: #f9fafb;
+        overflow-wrap: break-word;
+        padding: 12px;
+        white-space: pre-wrap;
+      }
+
+      table {
+        border-collapse: collapse;
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border: 1px solid #d0d5dd;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #f2f4f7;
+      }
+
+      .status {
+        border-radius: 999px;
+        display: inline-block;
+        font-weight: 700;
+        padding: 2px 8px;
+      }
+
+      .pass {
+        background: #dcfae6;
+        color: #067647;
+      }
+
+      .fail {
+        background: #fee4e2;
+        color: #b42318;
+      }
+
+      .warn {
+        background: #fef0c7;
+        color: #93370d;
+      }
+
+      .summary {
+        background: #f8fafc;
+        border: 1px solid #d0d5dd;
+        border-radius: 8px;
+        margin-top: 18px;
+        padding: 14px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .shot {
+        border: 1px solid #d0d5dd;
+        border-radius: 8px;
+        break-inside: avoid;
+        padding: 8px;
+      }
+
+      .shot img {
+        border-radius: 4px;
+        display: block;
+        max-height: 280px;
+        object-fit: contain;
+        width: 100%;
+      }
+
+      .muted {
+        color: #667085;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Reporte de pruebas E2E</h1>
+    <p class="muted">Proyecto: Mesa de ayuda Saidy | Fecha de ejecucion: 11 de mayo de 2026</p>
+
+    <div class="summary">
+      <p>
+        Se valido la app con Playwright y Selenium sobre el build de produccion servido con
+        <code>vite preview</code>. Selenium paso su smoke test completo. En Playwright, el smoke test paso y el
+        flujo completo con Supabase simulado paso cuando se ejecuto de forma aislada; la corrida completa fallo en
+        el caso de credenciales reales porque la app mostro <code>Failed to fetch</code> y la prueba esperaba el
+        texto <code>Credenciales incorrectas</code> o <code>Invalid login credentials</code>.
+      </p>
+    </div>
+
+    <h2>Resultado general</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Herramienta</th>
+          <th>Comando ejecutado</th>
+          <th>Resultado</th>
+          <th>Notas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Build</td>
+          <td><code>npm.cmd run build</code></td>
+          <td><span class="status pass">PASO</span></td>
+          <td>Compilo TypeScript y Vite. Vite aviso que un chunk supera 500 kB.</td>
+        </tr>
+        <tr>
+          <td>Playwright smoke</td>
+          <td><code>npm.cmd run test:playwright</code></td>
+          <td><span class="status pass">PASO</span></td>
+          <td>Valido login, formulario vacio, redireccion de rutas protegidas, 404 y vista movil.</td>
+        </tr>
+        <tr>
+          <td>Playwright credenciales reales</td>
+          <td><code>npm.cmd run test:playwright</code></td>
+          <td><span class="status fail">FALLO</span></td>
+          <td>La pantalla mostro <code>Failed to fetch</code> durante login; el test esperaba mensaje de credenciales invalidas.</td>
+        </tr>
+        <tr>
+          <td>Playwright flujo mock</td>
+          <td><code>npx.cmd playwright test tests/e2e/full-creation-flow.spec.ts -g "runs creation"</code></td>
+          <td><span class="status pass">PASO</span></td>
+          <td>Creo usuario, reunion, ticket, comentarios, cambio de estado y elimino usuario con Supabase simulado.</td>
+        </tr>
+        <tr>
+          <td>Selenium smoke</td>
+          <td><code>npm.cmd run test:selenium</code></td>
+          <td><span class="status pass">PASO</span></td>
+          <td>Valido login, error de formulario vacio, proteccion de admin, 404 y viewport movil en Chrome headless.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Como volver a correr las pruebas</h2>
+    <h3>Preparacion</h3>
+    <pre>npm install
+npm.cmd run build</pre>
+
+    <h3>Playwright</h3>
+    <pre>npm.cmd run test:playwright</pre>
+    <p>
+      Para repetir solo el flujo mockeado que paso en esta revision:
+    </p>
+    <pre>npx.cmd playwright test tests/e2e/full-creation-flow.spec.ts -g "runs creation"</pre>
+    <p>
+      Las capturas quedan en <code>playwright-capturas/</code> y los artefactos de fallos quedan en
+      <code>test-results/</code>.
+    </p>
+
+    <h3>Selenium</h3>
+    <pre>npm.cmd run test:selenium</pre>
+    <p>
+      Selenium usa Chrome headless y Selenium Manager. Si es la primera vez en una maquina nueva, puede necesitar
+      internet para descargar o localizar el driver de Chrome. Las capturas quedan en <code>selenium-capturas/</code>.
+    </p>
+
+    <h2>Detalle Selenium</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Validacion</th>
+          <th>Resultado</th>
+          <th>Detalle</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Carga de login</td>
+          <td><span class="status pass">PASO</span></td>
+          <td>Se mostro la pantalla de inicio de sesion.</td>
+        </tr>
+        <tr>
+          <td>Validacion de formulario vacio</td>
+          <td><span class="status pass">PASO</span></td>
+          <td>La app mostro el mensaje esperado.</td>
+        </tr>
+        <tr>
+          <td>Proteccion de /admin</td>
+          <td><span class="status pass">PASO</span></td>
+          <td>La ruta protegida redirigio a /login.</td>
+        </tr>
+        <tr>
+          <td>Ruta 404</td>
+          <td><span class="status pass">PASO</span></td>
+          <td>La app mostro la pagina de ruta no encontrada.</td>
+        </tr>
+        <tr>
+          <td>Login responsive movil</td>
+          <td><span class="status pass">PASO</span></td>
+          <td>La pantalla de login cargo en viewport movil.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Capturas Selenium</h2>
+    <div class="grid">
+      <div class="shot">
+        <h3>Login desktop</h3>
+        <img src="../selenium-capturas/01-login-desktop.png" alt="Login desktop con Selenium" />
+      </div>
+      <div class="shot">
+        <h3>Validacion login</h3>
+        <img src="../selenium-capturas/02-login-validacion.png" alt="Validacion del formulario con Selenium" />
+      </div>
+      <div class="shot">
+        <h3>Admin redirige a login</h3>
+        <img src="../selenium-capturas/03-admin-redirige-login.png" alt="Admin redirige al login con Selenium" />
+      </div>
+      <div class="shot">
+        <h3>Ruta no encontrada</h3>
+        <img src="../selenium-capturas/04-404.png" alt="Ruta 404 con Selenium" />
+      </div>
+      <div class="shot">
+        <h3>Login movil</h3>
+        <img src="../selenium-capturas/05-login-mobile.png" alt="Login movil con Selenium" />
+      </div>
+    </div>
+
+    <h2>Capturas Playwright</h2>
+    <div class="grid">
+      <div class="shot">
+        <h3>Login desktop</h3>
+        <img src="../playwright-capturas/01-login-desktop.png" alt="Login desktop con Playwright" />
+      </div>
+      <div class="shot">
+        <h3>Validacion login</h3>
+        <img src="../playwright-capturas/02-login-validacion.png" alt="Validacion del formulario con Playwright" />
+      </div>
+      <div class="shot">
+        <h3>Flujo mock admin</h3>
+        <img src="../playwright-capturas/full-flow/05-admin-dashboard-mock-ok.png" alt="Panel admin mock con Playwright" />
+      </div>
+      <div class="shot">
+        <h3>Ticket creado</h3>
+        <img src="../playwright-capturas/full-flow/15-empleado-ticket-creado-ok.png" alt="Ticket creado con Playwright" />
+      </div>
+    </div>
+  </body>
+</html>

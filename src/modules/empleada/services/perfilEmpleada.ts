@@ -7,14 +7,19 @@ type ActualizarPerfilInput = {
   password?: string;
 };
 
+type UsuariosUpdateQuery = {
+  update: (payload: Database["public"]["Tables"]["usuarios"]["Update"]) => {
+    eq: (column: "id", value: string) => PromiseLike<{ error: Error | null }>;
+  };
+};
+
 export async function actualizarPerfilEmpleada({ userId, nombre, password }: ActualizarPerfilInput) {
   const payload: Database["public"]["Tables"]["usuarios"]["Update"] = {
     nombre,
   };
 
-  const { error: profileError } = await (supabase.from("usuarios") as any)
-    .update(payload)
-    .eq("id", userId);
+  const usuariosQuery = supabase.from("usuarios") as unknown as UsuariosUpdateQuery;
+  const { error: profileError } = await usuariosQuery.update(payload).eq("id", userId);
 
   if (profileError) {
     throw new Error("No se pudo actualizar el perfil.");
