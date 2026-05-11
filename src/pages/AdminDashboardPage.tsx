@@ -651,7 +651,7 @@ export function AdminDashboardPage() {
                   plataforma === "microsoft_teams"
                     ? "https://teams.microsoft.com/l/meetup-join/..."
                     : plataforma === "google_meet"
-                      ? "Se generara automaticamente"
+                      ? "Pega un link de Meet o dejalo vacio para generarlo"
                       : "https://..."
                 }
               />
