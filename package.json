@@ -13,6 +13,7 @@
     "test:selenium": "node tests/selenium/app-smoke.selenium.cjs"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.20",
     "@fullcalendar/daygrid": "^6.1.20",
     "@fullcalendar/interaction": "^6.1.20",
     "@fullcalendar/react": "^6.1.20",

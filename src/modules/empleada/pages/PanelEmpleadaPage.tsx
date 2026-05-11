@@ -11,7 +11,6 @@ import {
   MapPin,
   PencilLine,
   Send,
-  TicketCheck,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
@@ -285,10 +284,14 @@ export function PanelEmpleadaPage() {
             key={stat.label}
             className="group rounded-[28px] border border-slate-200/90 bg-white p-5 shadow-[0_22px_54px_-40px_rgba(15,23,42,0.4)] transition duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_28px_70px_-40px_rgba(15,23,42,0.55)]"
           >
-            <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br ${stat.tone} ring-1 shadow-sm`}>
+            <div
+              className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br ${stat.tone} ring-1 shadow-sm`}
+            >
               <stat.icon className="h-5 w-5" aria-hidden="true" />
             </div>
-            <p className="text-3xl font-black tracking-[-0.03em] text-slate-950">{String(stat.value).padStart(2, "0")}</p>
+            <p className="text-3xl font-black tracking-[-0.03em] text-slate-950">
+              {String(stat.value).padStart(2, "0")}
+            </p>
             <p className="mt-1 text-sm font-bold text-slate-500">{stat.label}</p>
           </article>
         ))}
@@ -522,6 +525,7 @@ export function PanelEmpleadaPage() {
               <p className="mt-1 text-sm text-slate-500">Novedades y avisos compartidos por administracion.</p>
             </div>
           </div>
+
           {isLoadingEvents ? (
             <div className="flex items-center justify-center gap-3 px-5 py-10 text-sm font-medium text-slate-500">
               <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
