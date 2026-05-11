@@ -12,9 +12,7 @@ export async function actualizarPerfilEmpleada({ userId, nombre, password }: Act
     nombre,
   };
 
-  const { error: profileError } = await (supabase.from("usuarios") as any)
-    .update(payload)
-    .eq("id", userId);
+  const { error: profileError } = await supabase.from("usuarios").update(payload as never).eq("id", userId);
 
   if (profileError) {
     throw new Error("No se pudo actualizar el perfil.");
